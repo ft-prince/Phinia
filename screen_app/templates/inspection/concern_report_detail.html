@@ -1,0 +1,56 @@
+{% extends 'inspection/base.html' %}
+
+{% block title %}Concern Report Details{% endblock %}
+
+{% block content %}
+<div class="card animate__animated animate__fadeIn">
+    <div class="card-header">
+        <h2 class="animate__animated animate__slideInLeft">Concern Report Details</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Inspection: {{ concern_report.inspection.dvis_number }}</h4>
+                <p><strong>Date:</strong> {{ concern_report.reported_at }}</p>
+            </div>
+        </div>
+        
+        <div class="mt-3">
+            <h5>Concern Identified</h5>
+            <p>{{ concern_report.concern_identified }}</p>
+        </div>
+        
+        {% if concern_report.cause %}
+        <div class="mt-3">
+            <h5>Cause</h5>
+            <p>{{ concern_report.cause }}</p>
+        </div>
+        {% endif %}
+        
+        <div class="mt-3">
+            <h5>Action Taken</h5>
+            <p>{{ concern_report.action_taken }}</p>
+        </div>
+        
+        <div class="mt-3">
+            <h5>Approvals</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Manufacturing Approval:</strong> 
+                    {{ concern_report.manufacturing_approval.name|default:'Pending' }}
+                </div>
+                <div class="col-md-6">
+                    <strong>Quality Approval:</strong> 
+                    {{ concern_report.quality_approval.name|default:'Pending' }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{% url 'inspection_detail' pk=concern_report.inspection.pk %}" class="btn btn-secondary">
+                Back to Inspection
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

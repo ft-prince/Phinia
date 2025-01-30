@@ -1,0 +1,391 @@
+{% extends 'inspection/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        {{ subgroup_formset.management_form }}
+        <div class="card">
+            {% if subgroup_form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ subgroup_form.non_field_errors }}
+                </div>
+            {% endif %}
+    
+        <!-- Basic Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="{{ form.document_date.id_for_label }}" class="form-label">Document Date</label>
+                        {{ form.document_date }}
+                        {% if form.document_date.errors %}
+                            <div class="invalid-feedback">{{ form.document_date.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="{{ form.shift.id_for_label }}" class="form-label">Shift</label>
+                        {{ form.shift }}
+                        {% if form.shift.errors %}
+                            <div class="invalid-feedback">{{ form.shift.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="{{ form.line.id_for_label }}" class="form-label">Line</label>
+                        {{ form.line }}
+                        {% if form.line.errors %}
+                            <div class="invalid-feedback">{{ form.line.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="{{ form.part_number.id_for_label }}" class="form-label">Part Number</label>
+                        {{ form.part_number }}
+                        {% if form.part_number.errors %}
+                            <div class="invalid-feedback">{{ form.part_number.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.dvis_number.id_for_label }}" class="form-label">DVIS Number</label>
+                        {{ form.dvis_number }}
+                        {% if form.dvis_number.errors %}
+                            <div class="invalid-feedback">{{ form.dvis_number.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subgroups -->
+        {% for subgroup_form in subgroup_formset %}
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-layer-group me-2"></i>Sub Group {{ forloop.counter }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {{ subgroup_form.management_form }}
+                    <input type="hidden" 
+                    name="{{ subgroup_form.prefix }}-group_number" 
+                    value="{{ forloop.counter }}"
+                    id="id_{{ subgroup_form.prefix }}-group_number">
+         
+                    <!-- Personnel Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label">Operator</label>
+                            {{ subgroup_form.operator }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Team Leader</label>
+                            {{ subgroup_form.team_leader }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Supervisor</label>
+                            {{ subgroup_form.supervisor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Quality Supervisor</label>
+                            {{ subgroup_form.quality_supervisor }}
+                        </div>
+                    </div>
+
+                    <!-- Measurements Section -->
+                    <div class="measurements-section">
+                        <h6 class="mb-3">Measurement Samples</h6>
+                        {{ subgroup_form.measurement_formset.management_form }}
+                        
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Parameter</th>
+                                        {% for i in "12345" %}
+                                            <th>Sample {{ i }}
+                                                <input type="hidden" 
+                                                       name="measurements_{{ subgroup_form.instance.id }}-{{ forloop.counter0 }}-sample_number" 
+                                                       value="{{ forloop.counter }}">
+                                            </th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Program Selection -->
+                                    <tr>
+                                        <td>Program Selection</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.program_selection }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    
+                                    <!-- Line Pressure -->
+                                    <tr>
+                                        <td>Line Pressure (4.5-5.5 bar)</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.line_pressure }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    
+                                    <!-- O-ring Condition -->
+                                    <tr>
+                                        <td>O-ring Condition</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.oring_condition }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    
+                                    <!-- UV Flow Test -->
+                                    <tr>
+                                        <td>UV Flow Test (11-15 kPA)</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.uv_flow_test_pressure }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    
+                                    <!-- UV Vacuum Test -->
+                                    <tr>
+                                        <td>UV Vacuum Test (-35 to -43 KPa)</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.uv_vacuum_test }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    
+                                    <!-- UV Flow Value -->
+                                    <tr>
+                                        <td>UV Flow Value (30-40 LPM)</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.uv_flow_value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                        
+                                    <!-- LVDT Verification -->
+                                    <tr>
+                                        <td>LVDT Verification</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.lvdt_verification }}</td>
+                                        {% endfor %}
+                                    </tr>
+                        
+                                    <!-- Master Verification -->
+                                    <tr>
+                                        <td>Master Verification</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.master_verification }}</td>
+                                        {% endfor %}
+                                    </tr>
+                        
+                                    <!-- Vacuum Test Pressure -->
+                                    <tr>
+                                        <td>Vacuum Test Pressure (0.25-0.3 MPa)</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.vacuum_test_pressure }}</td>
+                                        {% endfor %}
+                                    </tr>
+                        
+                                    <!-- Status Fields -->
+                                    <tr>
+                                        <td>Workstation Clean</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.workstation_clean }}</td>
+                                        {% endfor %}
+                                    </tr>
+                        
+                                    <tr>
+                                        <td>Error Proofing Verified</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.error_proofing_verified }}</td>
+                                        {% endfor %}
+                                    </tr>
+                        
+                                    <tr>
+                                        <td>Contamination Free</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.contamination_free }}</td>
+                                        {% endfor %}
+                                    </tr>
+                        
+                                    <!-- Lubrication Fields -->
+                                    <tr>
+                                        <td>Retainer Lubrication</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.retainer_lubrication }}</td>
+                                        {% endfor %}
+                                    </tr>
+                        
+                                    <tr>
+                                        <td>UV Clip Pressing</td>
+                                        {% for form in subgroup_form.measurement_formset %}
+                                            <td>{{ form.uv_clip_pressing }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Tool Information -->
+                        <div class="tool-info mt-4">
+                            <h6 class="mb-3">Tool Information</h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Top Tool ID</label>
+                                    {% for form in subgroup_form.measurement_formset %}
+                                        {% if forloop.first %}
+                                            {{ form.top_tool_id }}
+                                        {% else %}
+                                            <input type="hidden" name="measurements_{{ subgroup_form.instance.id }}-{{ forloop.counter0 }}-top_tool_id" 
+                                                   class="tool-field" data-field="top_tool_id">
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Bottom Tool ID</label>
+                                    {% for form in subgroup_form.measurement_formset %}
+                                        {% if forloop.first %}
+                                            {{ form.bottom_tool_id }}
+                                        {% else %}
+                                            <input type="hidden" name="measurements_{{ subgroup_form.instance.id }}-{{ forloop.counter0 }}-bottom_tool_id" 
+                                                   class="tool-field" data-field="bottom_tool_id">
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">UV Assy Stage ID</label>
+                                    {% for form in subgroup_form.measurement_formset %}
+                                        {% if forloop.first %}
+                                            {{ form.uv_assy_stage_id }}
+                                        {% else %}
+                                            <input type="hidden" name="measurements_{{ subgroup_form.instance.id }}-{{ forloop.counter0 }}-uv_assy_stage_id" 
+                                                   class="tool-field" data-field="uv_assy_stage_id">
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Retainer Part Number</label>
+                                    {% for form in subgroup_form.measurement_formset %}
+                                        {% if forloop.first %}
+                                            {{ form.retainer_part_number }}
+                                        {% else %}
+                                            <input type="hidden" name="measurements_{{ subgroup_form.instance.id }}-{{ forloop.counter0 }}-retainer_part_number" 
+                                                   class="tool-field" data-field="retainer_part_number">
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">UV Clip Part Number</label>
+                                    {% for form in subgroup_form.measurement_formset %}
+                                        {% if forloop.first %}
+                                            {{ form.uv_clip_part_number }}
+                                        {% else %}
+                                            <input type="hidden" name="measurements_{{ subgroup_form.instance.id }}-{{ forloop.counter0 }}-uv_clip_part_number" 
+                                                   class="tool-field" data-field="uv_clip_part_number">
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Umbrella Part Number</label>
+                                    {% for form in subgroup_form.measurement_formset %}
+                                        {% if forloop.first %}
+                                            {{ form.umbrella_part_number }}
+                                        {% else %}
+                                            <input type="hidden" name="measurements_{{ subgroup_form.instance.id }}-{{ forloop.counter0 }}-umbrella_part_number" 
+                                                   class="tool-field" data-field="umbrella_part_number">
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        <!-- Submit Buttons -->
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save Inspection
+            </button>
+            <a href="{% url 'inspection_list' %}" class="btn btn-secondary ms-2">
+                <i class="fas fa-times me-2"></i>Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Handle program selection changes
+   // Add this to your existing JavaScript
+document.querySelectorAll('[name$="program_selection"]').forEach(select => {
+    select.addEventListener('change', function() {
+        const subgroupSection = this.closest('.card');
+        const toolFields = subgroupSection.querySelectorAll('.tool-field');
+        const firstSamples = {
+            top_tool_id: subgroupSection.querySelector('[name$="-0-top_tool_id"]'),
+            bottom_tool_id: subgroupSection.querySelector('[name$="-0-bottom_tool_id"]'),
+            uv_assy_stage_id: subgroupSection.querySelector('[name$="-0-uv_assy_stage_id"]'),
+            retainer_part_number: subgroupSection.querySelector('[name$="-0-retainer_part_number"]'),
+            uv_clip_part_number: subgroupSection.querySelector('[name$="-0-uv_clip_part_number"]'),
+            umbrella_part_number: subgroupSection.querySelector('[name$="-0-umbrella_part_number"]')
+        };
+
+        toolFields.forEach(field => {
+            const fieldType = field.dataset.field;
+            if (firstSamples[fieldType]) {
+                field.value = firstSamples[fieldType].value;
+            }
+        });
+    });
+});
+});
+</script>
+{% endblock %}
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 0.5rem;
+}
+
+.form-control, .form-select {
+    font-size: 0.875rem;
+}
+
+.invalid-feedback {
+    display: block;
+}
+
+.tool-info {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.25rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends 'inspection/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="m-0">
+                        <i class="fas fa-clipboard-list me-2"></i> Inspection Report Center
+                    </h1>
+                    <div>
+                        <span class="badge bg-primary">{{ current_shift }}</span>
+                        <span class="badge bg-secondary ms-2">{{ current_block }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Inspections</h5>
+                    <p class="card-text h3">{{ total_inspections }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Today's Inspections</h5>
+                    <p class="card-text h3">{{ today_inspections }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Current Shift</h5>
+                    <p class="card-text h3">{{ shift_inspections }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Current Block</h5>
+                    <p class="card-text h3">{{ block_inspections }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shift-wise Breakdown -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Day Shift (08:00 - 20:00)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Time Block</th>
+                                    <th>Inspections</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in day_shift_stats %}
+                                <tr>
+                                    <td>{{ stat.time_block }}</td>
+                                    <td>{{ stat.count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Night Shift (20:00 - 08:00)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Time Block</th>
+                                    <th>Inspections</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in night_shift_stats %}
+                                <tr>
+                                    <td>{{ stat.time_block }}</td>
+                                    <td>{{ stat.count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Existing Filters Section -->
+    <form method="get" class="row mb-4">
+        <div class="col-md-2 mb-2">
+            <label class="form-label">Search</label>
+            <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ request.GET.search }}">
+        </div>
+
+        <div class="col-md-2 mb-2">
+            <label class="form-label">Shift</label>
+            <select name="shift" class="form-select">
+                <option value="">All Shifts</option>
+                <option value="DAY" {% if request.GET.shift == "DAY" %}selected{% endif %}>Day Shift</option>
+                <option value="NIGHT" {% if request.GET.shift == "NIGHT" %}selected{% endif %}>Night Shift</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 mb-2">
+            <label class="form-label">Time Block</label>
+            <select name="time_block" class="form-select">
+                <option value="">All Blocks</option>
+                <option value="08:00" {% if request.GET.time_block == "08:00" %}selected{% endif %}>08:00 - 10:00</option>
+                <option value="10:00" {% if request.GET.time_block == "10:00" %}selected{% endif %}>10:00 - 12:00</option>
+                <option value="12:00" {% if request.GET.time_block == "12:00" %}selected{% endif %}>12:00 - 14:00</option>
+                <option value="14:00" {% if request.GET.time_block == "14:00" %}selected{% endif %}>14:00 - 16:00</option>
+                <option value="16:00" {% if request.GET.time_block == "16:00" %}selected{% endif %}>16:00 - 18:00</option>
+                <option value="18:00" {% if request.GET.time_block == "18:00" %}selected{% endif %}>18:00 - 20:00</option>
+                <option value="20:00" {% if request.GET.time_block == "20:00" %}selected{% endif %}>20:00 - 22:00</option>
+                <option value="22:00" {% if request.GET.time_block == "22:00" %}selected{% endif %}>22:00 - 00:00</option>
+                <option value="00:00" {% if request.GET.time_block == "00:00" %}selected{% endif %}>00:00 - 02:00</option>
+                <option value="02:00" {% if request.GET.time_block == "02:00" %}selected{% endif %}>02:00 - 04:00</option>
+                <option value="04:00" {% if request.GET.time_block == "04:00" %}selected{% endif %}>04:00 - 06:00</option>
+                <option value="06:00" {% if request.GET.time_block == "06:00" %}selected{% endif %}>06:00 - 08:00</option>
+            </select>
+        </div>
+
+        <!-- Keep existing status and date filters -->
+        <div class="col-md-2 mb-2">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>Pending</option>
+                <option value="complete" {% if request.GET.status == "complete" %}selected{% endif %}>Complete</option>
+                <option value="rejected" {% if request.GET.status == "rejected" %}selected{% endif %}>Rejected</option>
+            </select>
+        </div>
+
+        <div class="col-md-4 mb-2">
+            <label class="form-label">Date Range</label>
+            <div class="d-flex">
+                <input type="date" name="start_date" class="form-control me-2" value="{{ request.GET.start_date }}">
+                <input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+            </div>
+        </div>
+
+        <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a href="{% url 'inspection_list' %}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+
+    <!-- Table Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>DVIS Tracker</th>
+                            <th>Inspection Date</th>
+                            <th>Operational Shift</th>
+                            <th>Status</th>
+                            <th>Production Line</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inspection in inspections %}
+                        <tr>
+                            <td>{{ inspection.dvis_number }}</td>
+                            <td>{{ inspection.document_date }}</td>
+                            <td>{{ inspection.get_shift_display }}</td>
+                            <td>{{ inspection.get_status_display }}</td>
+                            <td>{{ inspection.line }}</td>
+                            <td>
+                                <a href="{% url 'inspection_detail' pk=inspection.pk %}" class="btn btn-info btn-sm">Details</a>
+                                <a href="{% url 'inspection_edit' pk=inspection.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="{% url 'inspection_delete' pk=inspection.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No inspections found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

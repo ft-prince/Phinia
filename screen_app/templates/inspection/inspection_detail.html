@@ -1,0 +1,1023 @@
+{% extends 'inspection/base.html' %}
+{% load static %}
+
+{% block title %}Inspection Detail - {{ inspection.dvis_number }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Main Container Styles */
+    .detail-container {
+        padding: 20px;
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+
+    /* Card Styles */
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+        transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .card-header {
+        background: linear-gradient(45deg, #2c3e50, #34495e);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px 12px 0 0;
+        font-weight: 600;
+    }
+
+    /* Status Indicators */
+    .status-ok {
+        color: #2ecc71;
+        font-weight: 600;
+    }
+
+    .status-ng {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    /* Measurement Table Styles */
+    .measurement-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .measurement-table th {
+        background-color: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .measurement-table td {
+        padding: 12px;
+        border-top: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+
+    .measurement-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Tool Information Cards */
+    .tool-card {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 4px solid #3498db;
+    }
+
+    .tool-card h6 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    /* Charts Container */
+    /* Add to your existing CSS */
+    .charts-container {
+        height: 350px;  /* Increased height */
+        padding: 25px;
+        margin-bottom: 30px;
+        background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .chart-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    /* Personnel Badge Styles */
+    .personnel-badge {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .personnel-badge:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .personnel-badge i {
+        font-size: 24px;
+        color: #3498db;
+        margin-bottom: 10px;
+    }
+
+    .personnel-badge .role {
+        font-size: 12px;
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+
+    /* Action Buttons */
+    .action-button {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-left: 10px;
+    }
+
+    .edit-button {
+        background-color: #f39c12;
+        color: white;
+    }
+
+    .delete-button {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    /* Responsive Tabs */
+    .nav-tabs {
+        border-bottom: 2px solid #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: #7f8c8d;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #3498db;
+        border-bottom: 2px solid #3498db;
+    }
+    .info-card .badge {
+        font-size: 0.9em;
+        padding: 0.5em 0.8em;
+    }
+    
+    .concern-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .concern-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .concern-title {
+        color: #2c3e50;
+        line-height: 1.4;
+    }
+    
+    .concern-actions {
+        border-top: 1px solid #eee;
+        padding-top: 1rem;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 0.5em 0.8em;
+    }
+    
+    .modal-header, .modal-footer {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+    
+    .concern-details {
+        font-size: 0.95rem;
+    }
+    
+    .concern-details label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .table td, .table th {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .btn-group .btn i {
+        font-size: 0.875rem;
+    }
+    
+    .modal-content {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header, .modal-footer {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <!-- Header Section -->
+     
+    <div class="info-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">
+                <i class="fas fa-clipboard-check me-2"></i>
+                Inspection #{{ inspection.dvis_number }}
+            </h2>
+            <div>
+                <div class="btn-group me-3">
+                    <a href="?export=excel" class="btn btn-success btn-sm">
+                        <i class="fas fa-file-excel me-2"></i>Export Excel
+                    </a>
+         
+                </div>
+
+                <a href="{% url 'inspection_edit' pk=inspection.pk %}" class="action-button edit-button">
+                    <i class="fas fa-edit me-2"></i>Edit
+                </a>
+                <a href="{% url 'inspection_delete' pk=inspection.pk %}" class="action-button delete-button">
+                    <i class="fas fa-trash me-2"></i>Delete
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="30%"><i class="fas fa-calendar me-2"></i>Date:</th>
+                            <td>{{ inspection.document_date }}</td>
+                        </tr>
+                        <tr>
+                            <th><i class="fas fa-clock me-2"></i>Shift:</th>
+                            <td>{{ inspection.get_shift_display }}</td>
+                        </tr>
+                        <tr>
+                            <th><i class="fas fa-industry me-2"></i>Line:</th>
+                            <td>{{ inspection.line }}</td>
+                        </tr>
+                        <tr>
+                            <th><i class="fas fa-barcode me-2"></i>Part Number:</th>
+                            <td>{{ inspection.part_number }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <div class="charts-container">
+                        <canvas id="measurementsOverview"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Measurements Tabs -->
+    <ul class="nav nav-tabs" id="measurementsTabs" role="tablist">
+        {% for subgroup in inspection.subgroup_set.all %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if forloop.first %}active{% endif %}" 
+                    id="subgroup-{{ subgroup.group_number }}-tab" 
+                    data-bs-toggle="tab" 
+                    data-bs-target="#subgroup-{{ subgroup.group_number }}" 
+                    type="button" 
+                    role="tab">
+                Subgroup {{ subgroup.group_number }}
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="measurementsContent">
+        {% for subgroup in inspection.subgroup_set.all %}
+        <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" 
+             id="subgroup-{{ subgroup.group_number }}" 
+             role="tabpanel">
+            
+            <!-- Personnel Section -->
+            <div class="info-card">
+                <div class="card-header">
+                    <i class="fas fa-users me-2"></i>Personnel
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="personnel-badge">
+                                <i class="fas fa-user"></i>
+                                <h6 class="mb-1">{{ subgroup.operator.name }}</h6>
+                                <div class="role">Operator</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="personnel-badge">
+                                <i class="fas fa-user-tie"></i>
+                                <h6 class="mb-1">{{ subgroup.team_leader.name }}</h6>
+                                <div class="role">Team Leader</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="personnel-badge">
+                                <i class="fas fa-user-shield"></i>
+                                <h6 class="mb-1">{{ subgroup.supervisor.name }}</h6>
+                                <div class="role">Supervisor</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="personnel-badge">
+                                <i class="fas fa-user-check"></i>
+                                <h6 class="mb-1">{{ subgroup.quality_supervisor.name }}</h6>
+                                <div class="role">Quality Supervisor</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!-- Measurements Section -->
+<div class="info-card">
+    <div class="card-header">
+        <i class="fas fa-chart-line me-2"></i>Measurements
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="measurement-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <th>Sample {{ sample.sample_number }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Program Selection -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-microchip me-2"></i>Program Selection
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td>{{ sample.get_program_selection_display }}</td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Line Pressure -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-tachometer-alt me-2"></i>Line Pressure (4.5-5.5 bar)
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.line_pressure < 4.5 or sample.line_pressure > 5.5 %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.line_pressure }} bar
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- O-ring Condition -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-circle me-2"></i>O-ring Condition
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.oring_condition == 'NG' %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.get_oring_condition_display }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- UV Flow Test -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-wave-square me-2"></i>UV Flow Test (11-15 kPA)
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.uv_flow_test_pressure < 11 or sample.uv_flow_test_pressure > 15 %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.uv_flow_test_pressure }} kPA
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- UV Vacuum Test -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-compress-arrows-alt me-2"></i>UV Vacuum Test (-35 to -43 KPa)
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.uv_vacuum_test > -35 or sample.uv_vacuum_test < -43 %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.uv_vacuum_test }} KPa
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- UV Flow Value -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-tint me-2"></i>UV Flow Value (30-40 LPM)
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.uv_flow_value < 30 or sample.uv_flow_value > 40 %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.uv_flow_value }} LPM
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Vacuum Test Pressure -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-compress me-2"></i>Vacuum Test Pressure (0.25-0.3 MPa)
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.vacuum_test_pressure < 0.25 or sample.vacuum_test_pressure > 0.3 %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.vacuum_test_pressure }} MPa
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- LVDT Verification -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-check-circle me-2"></i>LVDT Verification
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.lvdt_verification == 'NG' %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.get_lvdt_verification_display }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Master Verification -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-check-square me-2"></i>Master Verification
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.master_verification == 'NG' %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.get_master_verification_display }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Retainer Lubrication -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-oil-can me-2"></i>Retainer Lubrication
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.retainer_lubrication == 'NG' %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.get_retainer_lubrication_display }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- UV Clip Pressing -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-compress-arrows-alt me-2"></i>UV Clip Pressing
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.uv_clip_pressing == 'NG' %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.get_uv_clip_pressing_display }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Workstation Clean -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-broom me-2"></i>Workstation Clean
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.workstation_clean == 'NO' %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.get_workstation_clean_display }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Error Proofing Verified -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-shield-alt me-2"></i>Error Proofing Verified
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.error_proofing_verified == 'NO' %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.get_error_proofing_verified_display }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    <!-- Contamination Free -->
+                    <tr>
+                        <td>
+                            <i class="fas fa-virus-slash me-2"></i>Contamination Free
+                        </td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.contamination_free == 'NO' %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.get_contamination_free_display }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Tool Information Section -->
+<div class="info-card">
+    <div class="card-header">
+        <i class="fas fa-tools me-2"></i>Tool Information
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% with first_sample=subgroup.measurementsample_set.first %}
+                <!-- Top Tool ID -->
+                <div class="col-md-4 mb-3">
+                    <div class="tool-card">
+                        <h6><i class="fas fa-wrench me-2"></i>Top Tool ID</h6>
+                        <p class="mb-0">{{ first_sample.get_top_tool_id_display }}</p>
+                    </div>
+                </div>
+
+                <!-- Bottom Tool ID -->
+                <div class="col-md-4 mb-3">
+                    <div class="tool-card">
+                        <h6><i class="fas fa-wrench me-2"></i>Bottom Tool ID</h6>
+                        <p class="mb-0">{{ first_sample.get_bottom_tool_id_display }}</p>
+                    </div>
+                </div>
+
+                <!-- UV Assy Stage ID -->
+                <div class="col-md-4 mb-3">
+                    <div class="tool-card">
+                        <h6><i class="fas fa-cog me-2"></i>UV Assy Stage ID</h6>
+                        <p class="mb-0">{{ first_sample.get_uv_assy_stage_id_display }}</p>
+                    </div>
+                </div>
+
+                <!-- Retainer Part Number -->
+                <div class="col-md-4 mb-3">
+                    <div class="tool-card">
+                        <h6><i class="fas fa-barcode me-2"></i>Retainer Part Number</h6>
+                        <p class="mb-0">{{ first_sample.get_retainer_part_number_display }}</p>
+                    </div>
+                </div>
+
+                <!-- UV Clip Part Number -->
+                <div class="col-md-4 mb-3">
+                    <div class="tool-card">
+                        <h6><i class="fas fa-barcode me-2"></i>UV Clip Part Number</h6>
+                        <p class="mb-0">{{ first_sample.get_uv_clip_part_number_display }}</p>
+                    </div>
+                </div>
+
+                <!-- Umbrella Part Number -->
+                <div class="col-md-4 mb-3">
+                    <div class="tool-card">
+                        <h6><i class="fas fa-barcode me-2"></i>Umbrella Part Number</h6>
+                        <p class="mb-0">{{ first_sample.get_umbrella_part_number_display }}</p>
+                    </div>
+                </div>
+            {% endwith %}
+        </div>
+    </div>
+</div>
+
+<!-- Replace the existing concern cards section -->
+<div class="info-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fas fa-exclamation-triangle me-2"></i>Concern Reports
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#concernFormModal">
+            <i class="fas fa-plus me-2"></i>Add New Concern
+        </button>
+    </div>
+    <div class="card-body">
+        {% if concern_reports %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Concern</th>
+                            <th>Cause</th>
+                            <th>Action Taken</th>
+                            <th>Manufacturing</th>
+                            <th>Quality</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for concern in concern_reports %}
+                            <tr>
+                                <td class="text-nowrap">
+                                    <small>
+                                        <i class="fas fa-calendar-alt me-1 text-muted"></i>
+                                        {{ concern.reported_at|date:"Y-m-d" }}<br>
+                                        <i class="fas fa-clock me-1 text-muted"></i>
+                                        {{ concern.reported_at|date:"H:i" }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div style="max-width: 200px;">
+                                        {{ concern.concern_identified|truncatechars:50 }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="max-width: 200px;">
+                                        {{ concern.cause|default:"-"|truncatechars:50 }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="max-width: 200px;">
+                                        {{ concern.action_taken|truncatechars:50 }}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if concern.manufacturing_approval %}
+                                        <span class="text-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Approved
+                                        </span>
+                                    {% else %}
+                                        <span class="text-warning">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Pending
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if concern.quality_approval %}
+                                        <span class="text-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Approved
+                                        </span>
+                                    {% else %}
+                                        <span class="text-warning">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Pending
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if concern.manufacturing_approval and concern.quality_approval %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-primary view-concern-btn"
+                                                data-concern-id="{{ concern.id }}"
+                                                data-concern-text="{{ concern.concern_identified }}"
+                                                data-concern-cause="{{ concern.cause }}"
+                                                data-concern-action="{{ concern.action_taken }}"
+                                                data-concern-mfg="{{ concern.manufacturing_approval }}"
+                                                data-concern-quality="{{ concern.quality_approval }}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        {% if not concern.manufacturing_approval or not concern.quality_approval %}
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-warning edit-concern-btn"
+                                                    data-concern-id="{{ concern.id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-clipboard-check fa-3x mb-3 text-muted"></i>
+                <p class="text-muted">No concerns reported for this inspection.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- View Concern Modal -->
+<div class="modal fade" id="viewConcernModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">Concern Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="concern-details"></div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Concern Modal -->
+<div class="modal fade" id="concernFormModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">Report New Concern</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="concernForm" method="post" action="{% url 'concern_report_create' inspection_pk=inspection.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Concern Identified <span class="text-danger">*</span></label>
+                        <textarea name="concern_identified" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cause</label>
+                        <textarea name="cause" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Action Taken <span class="text-danger">*</span></label>
+                        <textarea name="action_taken" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Manufacturing Approval</label>
+                                <select name="manufacturing_approval" class="form-select form-select-sm">
+                                    <option value="">Select Employee</option>
+                                    {% for employee in employees %}
+                                        <option value="{{ employee.id }}">
+                                            {{ employee.name }} ({{ employee.get_role_display }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Quality Approval</label>
+                                <select name="quality_approval" class="form-select form-select-sm">
+                                    <option value="">Select Employee</option>
+                                    {% for employee in employees %}
+                                        <option value="{{ employee.id }}">
+                                            {{ employee.name }} ({{ employee.get_role_display }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Concern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Updated modal handling code
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap components
+    const viewModal = new bootstrap.Modal(document.getElementById('viewConcernModal'));
+    const formModal = new bootstrap.Modal(document.getElementById('concernFormModal'));
+
+    // View concern button handler
+    document.querySelectorAll('.view-concern-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const data = btn.dataset;
+            const detailsHtml = `
+                <div class="mb-4">
+                    <label class="fw-bold mb-2">Concern Identified:</label>
+                    <p class="ms-3 mb-0">${data.concernText}</p>
+                </div>
+                ${data.concernCause ? `
+                    <div class="mb-4">
+                        <label class="fw-bold mb-2">Cause:</label>
+                        <p class="ms-3 mb-0">${data.concernCause}</p>
+                    </div>
+                ` : ''}
+                <div class="mb-4">
+                    <label class="fw-bold mb-2">Action Taken:</label>
+                    <p class="ms-3 mb-0">${data.concernAction}</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold mb-2">Manufacturing Approval:</label>
+                        <p class="ms-3 mb-0">${data.concernMfg || 'Pending'}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold mb-2">Quality Approval:</label>
+                        <p class="ms-3 mb-0">${data.concernQuality || 'Pending'}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.querySelector('.concern-details').innerHTML = detailsHtml;
+            viewModal.show();
+        });
+    });
+
+    // Modal close button handlers
+    document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(button => {
+        button.addEventListener('click', () => {
+            viewModal.hide();
+            formModal.hide();
+        });
+    });
+
+    // Edit concern button handler
+    document.querySelectorAll('.edit-concern-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const concernId = btn.dataset.concernId;
+            const form = document.getElementById('concernForm');
+            // Update form action for edit
+            form.action = form.action.replace('create', `edit/${concernId}`);
+            formModal.show();
+        });
+    });
+
+    // Form validation handler
+    const concernForm = document.getElementById('concernForm');
+    if (concernForm) {
+        concernForm.addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        });
+    }
+
+    // Clean up modals when hidden
+    ['viewConcernModal', 'concernFormModal'].forEach(modalId => {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                if (modalId === 'concernFormModal') {
+                    document.getElementById('concernForm').reset();
+                }
+            });
+        }
+    });
+
+
+    // Measurements Overview Chart
+    const chartCanvas = document.getElementById('measurementsOverview');
+    if (chartCanvas) {
+        const ctx = chartCanvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Sample 1', 'Sample 2', 'Sample 3', 'Sample 4', 'Sample 5'],
+                datasets: [{
+                    label: 'Line Pressure',
+                    data: [
+                        {% for sample in inspection.subgroup_set.first.measurementsample_set.all %}
+                        {{ sample.line_pressure }}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                },
+                {
+                    label: 'UV Flow Value',
+                    data: [
+                        {% for sample in inspection.subgroup_set.first.measurementsample_set.all %}
+                        {{ sample.uv_flow_value }}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Measurements Overview',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(2);
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                        align: 'center',
+                        labels: {
+                            boxWidth: 20,
+                            padding: 20
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toFixed(2);
+                            }
+                        },
+                        grid: {
+                            borderDash: [2, 2]
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+    }
+
+    // Modal cleanup on hidden
+    ['viewConcernModal', 'concernFormModal'].forEach(modalId => {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                if (modalId === 'concernFormModal') {
+                    document.getElementById('concernForm').reset();
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

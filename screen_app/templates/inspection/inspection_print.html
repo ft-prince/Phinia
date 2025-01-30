@@ -1,0 +1,128 @@
+{% extends 'inspection/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="print-container">
+    <div class="header">
+        <h1>Inspection Report - {{ inspection.dvis_number }}</h1>
+        <div class="meta-info">
+            <p><strong>Date:</strong> {{ inspection.document_date }}</p>
+            <p><strong>Shift:</strong> {{ inspection.get_shift_display }}</p>
+            <p><strong>Line:</strong> {{ inspection.line }}</p>
+            <p><strong>Part Number:</strong> {{ inspection.part_number }}</p>
+        </div>
+    </div>
+
+    {% for subgroup in inspection.subgroup_set.all %}
+    <div class="subgroup-section">
+        <h2>Subgroup {{ subgroup.group_number }}</h2>
+        
+        <div class="personnel-section">
+            <h3>Personnel</h3>
+            <table class="personnel-table">
+                <tr>
+                    <th>Role</th>
+                    <th>Name</th>
+                </tr>
+                <tr>
+                    <td>Operator</td>
+                    <td>{{ subgroup.operator.name }}</td>
+                </tr>
+                <tr>
+                    <td>Team Leader</td>
+                    <td>{{ subgroup.team_leader.name }}</td>
+                </tr>
+                <tr>
+                    <td>Supervisor</td>
+                    <td>{{ subgroup.supervisor.name }}</td>
+                </tr>
+                <tr>
+                    <td>Quality Supervisor</td>
+                    <td>{{ subgroup.quality_supervisor.name }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="measurements-section">
+            <h3>Measurements</h3>
+            <table class="measurements-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <th>Sample {{ sample.sample_number }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Include all measurement rows similar to the detail template -->
+                    <tr>
+                        <td>Line Pressure (4.5-5.5 bar)</td>
+                        {% for sample in subgroup.measurementsample_set.all %}
+                            <td class="{% if sample.line_pressure < 4.5 or sample.line_pressure > 5.5 %}status-ng{% else %}status-ok{% endif %}">
+                                {{ sample.line_pressure }} bar
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    <!-- Add other measurement rows -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tool-info-section">
+            <h3>Tool Information</h3>
+            {% with first_sample=subgroup.measurementsample_set.first %}
+            <table class="tool-info-table">
+                <tr>
+                    <th>Top Tool ID</th>
+                    <td>{{ first_sample.get_top_tool_id_display }}</td>
+                </tr>
+                <tr>
+                    <th>Bottom Tool ID</th>
+                    <td>{{ first_sample.get_bottom_tool_id_display }}</td>
+                </tr>
+                <tr>
+                    <th>UV Assy Stage ID</th>
+                    <td>{{ first_sample.get_uv_assy_stage_id_display }}</td>
+                </tr>
+            </table>
+            {% endwith %}
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if inspection.concernreport_set.exists %}
+    <div class="concerns-section">
+        <h2>Concern Reports</h2>
+        <table class="concerns-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Concern</th>
+                    <th>Cause</th>
+                    <th>Action Taken</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for concern in inspection.concernreport_set.all %}
+                <tr>
+                    <td>{{ concern.reported_at|date:"Y-m-d H:i" }}</td>
+                    <td>{{ concern.concern_identified }}</td>
+                    <td>{{ concern.cause|default:"-" }}</td>
+                    <td>{{ concern.action_taken }}</td>
+                    <td>
+                        {% if concern.manufacturing_approval and concern.quality_approval %}
+                            Approved
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
