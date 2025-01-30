@@ -4,20 +4,21 @@
 {% block content %}
 <div class="container-fluid px-4">
         <!-- Header Section -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h1 class="m-0">
-                        <i class="fas fa-clipboard-list me-2"></i> Inspection Report Center
-                    </h1>
-                    <div>
-                        <span class="badge bg-primary">{{ current_shift }}</span>
-                        <span class="badge bg-secondary ms-2">{{ current_block }}</span>
-                    </div>
-                </div>
+<!-- Header Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="m-0">
+                <i class="fas fa-clipboard-list me-2"></i> Inspection Report Center
+            </h1>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-primary me-2">{{ current_shift }}</span>
+                <span class="badge bg-secondary me-3">{{ current_block }}</span>
+
             </div>
         </div>
-
+    </div>
+</div>
     <!-- Statistics Cards -->
     <div class="row mb-4">
         <div class="col-md-3">
@@ -55,63 +56,75 @@
     </div>
 
     <!-- Shift-wise Breakdown -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Day Shift (08:00 - 20:00)</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Time Block</th>
-                                    <th>Inspections</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for stat in day_shift_stats %}
-                                <tr>
-                                    <td>{{ stat.time_block }}</td>
-                                    <td>{{ stat.count }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+<!-- Shift-wise Breakdown -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Day Shift (08:00 AM - 08:00 PM)</h5>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Night Shift (20:00 - 08:00)</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Time Block</th>
-                                    <th>Inspections</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for stat in night_shift_stats %}
-                                <tr>
-                                    <td>{{ stat.time_block }}</td>
-                                    <td>{{ stat.count }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time Block</th>
+                                <th>Inspections</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in day_shift_stats %}
+                            <tr>
+                                <td>{{ stat.time_block }}</td>
+                                <td>{{ stat.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-info">
+                                <th>Total Day Shift</th>
+                                <th>{{ day_shift_total }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Night Shift (08:00 PM - 08:00 AM)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time Block</th>
+                                <th>Inspections</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in night_shift_stats %}
+                            <tr>
+                                <td>{{ stat.time_block }}</td>
+                                <td>{{ stat.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-info">
+                                <th>Total Night Shift</th>
+                                <th>{{ night_shift_total }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Existing Filters Section -->
     <form method="get" class="row mb-4">
@@ -133,21 +146,22 @@
             <label class="form-label">Time Block</label>
             <select name="time_block" class="form-select">
                 <option value="">All Blocks</option>
-                <option value="08:00" {% if request.GET.time_block == "08:00" %}selected{% endif %}>08:00 - 10:00</option>
-                <option value="10:00" {% if request.GET.time_block == "10:00" %}selected{% endif %}>10:00 - 12:00</option>
-                <option value="12:00" {% if request.GET.time_block == "12:00" %}selected{% endif %}>12:00 - 14:00</option>
-                <option value="14:00" {% if request.GET.time_block == "14:00" %}selected{% endif %}>14:00 - 16:00</option>
-                <option value="16:00" {% if request.GET.time_block == "16:00" %}selected{% endif %}>16:00 - 18:00</option>
-                <option value="18:00" {% if request.GET.time_block == "18:00" %}selected{% endif %}>18:00 - 20:00</option>
-                <option value="20:00" {% if request.GET.time_block == "20:00" %}selected{% endif %}>20:00 - 22:00</option>
-                <option value="22:00" {% if request.GET.time_block == "22:00" %}selected{% endif %}>22:00 - 00:00</option>
-                <option value="00:00" {% if request.GET.time_block == "00:00" %}selected{% endif %}>00:00 - 02:00</option>
-                <option value="02:00" {% if request.GET.time_block == "02:00" %}selected{% endif %}>02:00 - 04:00</option>
-                <option value="04:00" {% if request.GET.time_block == "04:00" %}selected{% endif %}>04:00 - 06:00</option>
-                <option value="06:00" {% if request.GET.time_block == "06:00" %}selected{% endif %}>06:00 - 08:00</option>
+                <!-- Day Shift -->
+                <option value="08:00" {% if request.GET.time_block == "08:00" %}selected{% endif %}>08:00 AM - 10:00 AM</option>
+                <option value="10:00" {% if request.GET.time_block == "10:00" %}selected{% endif %}>10:00 AM - 12:00 PM</option>
+                <option value="12:00" {% if request.GET.time_block == "12:00" %}selected{% endif %}>12:00 PM - 02:00 PM</option>
+                <option value="14:00" {% if request.GET.time_block == "14:00" %}selected{% endif %}>02:00 PM - 04:00 PM</option>
+                <option value="16:00" {% if request.GET.time_block == "16:00" %}selected{% endif %}>04:00 PM - 06:00 PM</option>
+                <option value="18:00" {% if request.GET.time_block == "18:00" %}selected{% endif %}>06:00 PM - 08:00 PM</option>
+                <!-- Night Shift -->
+                <option value="20:00" {% if request.GET.time_block == "20:00" %}selected{% endif %}>08:00 PM - 10:00 PM</option>
+                <option value="22:00" {% if request.GET.time_block == "22:00" %}selected{% endif %}>10:00 PM - 12:00 AM</option>
+                <option value="00:00" {% if request.GET.time_block == "00:00" %}selected{% endif %}>12:00 AM - 02:00 AM</option>
+                <option value="02:00" {% if request.GET.time_block == "02:00" %}selected{% endif %}>02:00 AM - 04:00 AM</option>
+                <option value="04:00" {% if request.GET.time_block == "04:00" %}selected{% endif %}>04:00 AM - 06:00 AM</option>
+                <option value="06:00" {% if request.GET.time_block == "06:00" %}selected{% endif %}>06:00 AM - 08:00 AM</option>
             </select>
         </div>
-
         <!-- Keep existing status and date filters -->
         <div class="col-md-2 mb-2">
             <label class="form-label">Status</label>

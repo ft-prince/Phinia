@@ -257,6 +257,8 @@ class InspectionListView(ListView):
             {'time_block': block, 'count': count}
             for block, count in night_blocks.items()
         ]
+        day_shift_total = sum(stat['count'] for stat in day_shift_stats)
+        night_shift_total = sum(stat['count'] for stat in night_shift_stats)
 
         context.update({
             'total_inspections': InspectionSheet.objects.count(),
@@ -267,6 +269,9 @@ class InspectionListView(ListView):
             'current_block': current_block,
             'day_shift_stats': day_shift_stats,
             'night_shift_stats': night_shift_stats,
+            'night_shift_total':night_shift_total,
+            'day_shift_total': day_shift_total,
+
         })
 
         return context    
